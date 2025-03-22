@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
 
 import prismaClient from "../config/getClient";
+import genToken from "../utils/genToken";
 
 interface SignUpBody {
   username: string;
@@ -38,6 +39,12 @@ export const signUp: RequestHandler<
       data: { username, email, password: hashedPassword },
     });
 
+    const tokenGenerated = genToken(user.id, res);
+
+    if (!tokenGenerated) {
+      throw createHttpError(409, "Authorization error");
+    }
+
     res.status(201).json({
       message: "Account created successfully",
     });
@@ -46,8 +53,38 @@ export const signUp: RequestHandler<
   }
 };
 
-export const logIn: RequestHandler = (req, res, next) => {
+interface LogInBody {
+  email: string;
+  password: string;
+}
+
+export const logIn: RequestHandler<
+  unknown,
+  unknown,
+  LogInBody,
+  unknown
+> = async (req, res, next) => {
+  const { email, password } = req.body;
   try {
+    // const user = await prismaClient.user.findUnique({ where: { email } });
+    const user = await prismaClient.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw createHttpError(404, "Account not Found!");
+    }
+
+    const checkPassword = await bcrypt.compare(password, user.password);
+    if (!checkPassword) {
+      throw createHttpError(409, "Invalid credentials");
+    }
+
+    const tokenGenerated = genToken(user.id, res);
+
+    if (!tokenGenerated) {
+      throw createHttpError(409, "Authorization error");
+    }
+
+    res.status(200).json({ message: "Logged in successfully" });
   } catch (error) {
     next(error);
   }
@@ -55,6 +92,13 @@ export const logIn: RequestHandler = (req, res, next) => {
 
 export const logOut: RequestHandler = (req, res, next) => {
   try {
+    res.cookie("key", "", {
+      expires: new Date(0),
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     next(error);
   }

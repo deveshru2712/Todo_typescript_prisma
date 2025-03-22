@@ -1,15 +1,17 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import morgran from "morgan";
+import cookieParser from "cookie-parser";
 import createHttpError, { isHttpError } from "http-errors";
-
-import authRouter from "./routes/auth.routes";
 import { z, ZodError } from "zod";
+
+import env from "./utils/validateEnv";
+import authRouter from "./routes/auth.routes";
 
 const app = express();
 
 app.use(morgran("dev"));
-
+app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
@@ -50,6 +52,6 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   res.status(statusCode).json({ error: errorMessage });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`The server is running on the port: ${process.env.PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`The server is running on the port: ${env.PORT}`);
 });

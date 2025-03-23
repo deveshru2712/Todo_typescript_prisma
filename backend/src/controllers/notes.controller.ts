@@ -80,7 +80,9 @@ export const deleteNote: RequestHandler<
       throw createHttpError(404, "User not found!");
     }
 
-    const todo = await prismaClient.todo.findFirst({ where: { id: noteId } });
+    const todo = await prismaClient.todo.findFirst({
+      where: { id: noteId, userId: userId },
+    });
 
     if (!todo) {
       throw createHttpError(404, "Todo not found");
@@ -101,7 +103,7 @@ export const deleteNote: RequestHandler<
 
 interface UpdateNoteBody {
   title: string;
-  text?: string;
+  text: string;
 }
 
 export const updateNote: RequestHandler<
@@ -111,7 +113,29 @@ export const updateNote: RequestHandler<
   unknown
 > = async (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
+  const { text, title } = req.body;
   try {
+    const noteId = parseInt(id);
+    const user = await prismaClient.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw createHttpError(404, "Unable to found User");
+    }
+
+    const note = await prismaClient.todo.update({
+      where: {
+        id: noteId,
+        userId,
+      },
+      data: {
+        text,
+        title,
+      },
+    });
+
+    res.status(200).json({
+      message: "Todo updated",
+    });
   } catch (error) {
     next(error);
   }

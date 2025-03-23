@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { z } from "zod";
 
-const authInputValidator =
+const InputValidator =
   (schema: z.ZodSchema): RequestHandler =>
   async (req, res, next) => {
     try {
@@ -14,4 +14,4 @@ const authInputValidator =
     }
   };
 
-export default authInputValidator;
+export default InputValidator;

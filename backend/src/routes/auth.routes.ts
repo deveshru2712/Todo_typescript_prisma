@@ -1,19 +1,19 @@
 import express from "express";
 import * as authController from "../controllers/auth.controller";
-import authInputValidator from "../Validator/authInputValidator";
+import InputValidator from "../Validator/InputValidator";
 import * as inputSchema from "../utils/zodAuthSchema";
 
 const router = express.Router();
 
 router.post(
   "/signup",
-  authInputValidator(inputSchema.signupSchema),
+  InputValidator(inputSchema.signupSchema),
   authController.signUp
 );
 
 router.post(
   "/login",
-  authInputValidator(inputSchema.loginSchema),
+  InputValidator(inputSchema.loginSchema),
   authController.logIn
 );
 

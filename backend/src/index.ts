@@ -3,10 +3,12 @@ import express, { NextFunction, Request, Response } from "express";
 import morgran from "morgan";
 import cookieParser from "cookie-parser";
 import createHttpError, { isHttpError } from "http-errors";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 
 import env from "./utils/validateEnv";
 import authRouter from "./routes/auth.routes";
+import todoRouter from "./routes/notes.routes";
+import protectRoute from "./middleware/protectRoute";
 
 const app = express();
 
@@ -15,6 +17,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/todo", protectRoute, todoRouter);
 
 app.use((req, res, next) => {
   next(createHttpError(404, "Page not found!"));

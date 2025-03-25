@@ -43,7 +43,7 @@ export const signUp: RequestHandler<
     const tokenGenerated = genToken(user.id, res);
 
     if (!tokenGenerated) {
-      throw createHttpError(409, "Authorization error");
+      throw createHttpError(401, "Authorization error");
     }
 
     res.status(201).json({
@@ -84,13 +84,13 @@ export const logIn: RequestHandler<
 
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
-      throw createHttpError(409, "Invalid credentials");
+      throw createHttpError(401, "Invalid credentials");
     }
 
     const tokenGenerated = genToken(user.id, res);
 
     if (!tokenGenerated) {
-      throw createHttpError(409, "Authorization error");
+      throw createHttpError(401, "Authorization error");
     }
 
     res.status(200).json({

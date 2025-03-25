@@ -12,12 +12,12 @@ const protectRoute: RequestHandler = async (req, res, next) => {
   try {
     const token = req.cookies.key;
     if (!token) {
-      throw createHttpError(409, "Unauthorized - no token exists");
+      throw createHttpError(401, "Unauthorized - no token exists");
     }
 
     const decode = jwt.verify(token, env.JWT_KEY) as JwtPayload;
     if (!decode) {
-      throw createHttpError(409, "Unauthorized - invalid token");
+      throw createHttpError(401, "Unauthorized - invalid token");
     }
 
     const user = await prismaClient.user.findUnique({

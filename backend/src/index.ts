@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import morgran from "morgan";
 import cookieParser from "cookie-parser";
 import createHttpError, { isHttpError } from "http-errors";
+import cors from "cors";
 import { z } from "zod";
 
 import env from "./utils/validateEnv";
@@ -12,6 +13,7 @@ import protectRoute from "./middleware/protectRoute";
 
 const app = express();
 
+app.use(cors());
 app.use(morgran("dev"));
 app.use(cookieParser());
 app.use(express.json());

@@ -37,10 +37,12 @@ const authStore = create<AuthStore>((set) => ({
     set({ isLoading: true });
     try {
       const response = await axios.post(`/api/auth/signup`, credentials);
+      console.log(response);
       set({
         user: response.data.user,
         isLoading: false,
       });
+      toast.success(response.data.message);
     } catch (error) {
       set({
         user: null,
@@ -62,6 +64,7 @@ const authStore = create<AuthStore>((set) => ({
         user: response.data.user,
         isLoading: false,
       });
+      toast.success(response.data.message);
     } catch (error) {
       set({
         user: null,
@@ -78,12 +81,12 @@ const authStore = create<AuthStore>((set) => ({
   logOut: async () => {
     set({ isLoading: true });
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const response = await axios.post("/api/auth/logout");
       set({
         user: null,
         isLoading: false,
       });
+      toast.success(response.data.message);
     } catch (error) {
       set({ isLoading: false });
       if (axios.isAxiosError(error)) {
@@ -102,14 +105,9 @@ const authStore = create<AuthStore>((set) => ({
         isAuthChecking: false,
         user: response.data.user,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({ isAuthChecking: false, user: null });
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || "Logout failed";
-        toast.error(errorMessage);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
     }
   },
 }));

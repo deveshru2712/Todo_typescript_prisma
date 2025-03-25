@@ -37,6 +37,7 @@ export const signUp: RequestHandler<
 
     const user = await prismaClient.user.create({
       data: { username, email, password: hashedPassword },
+      select: { id: true, email: true, username: true },
     });
 
     const tokenGenerated = genToken(user.id, res);
@@ -46,6 +47,7 @@ export const signUp: RequestHandler<
     }
 
     res.status(201).json({
+      user,
       message: "Account created successfully",
     });
   } catch (error) {
@@ -66,8 +68,15 @@ export const logIn: RequestHandler<
 > = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    // const user = await prismaClient.user.findUnique({ where: { email } });
-    const user = await prismaClient.user.findUnique({ where: { email } });
+    const user = await prismaClient.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        password: true,
+      },
+    });
 
     if (!user) {
       throw createHttpError(404, "Account not Found!");
@@ -84,7 +93,12 @@ export const logIn: RequestHandler<
       throw createHttpError(409, "Authorization error");
     }
 
-    res.status(200).json({ message: "Logged in successfully" });
+    res
+      .status(200)
+      .json({
+        user: { ...user, password: null },
+        message: "Logged in successfully",
+      });
   } catch (error) {
     next(error);
   }

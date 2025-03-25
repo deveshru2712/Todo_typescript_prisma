@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import prismaClient from "../config/getClient";
 import createHttpError from "http-errors";
-
 import { ParamsDictionary } from "express-serve-static-core";
 
 export const getNotes: RequestHandler = async (req, res, next) => {

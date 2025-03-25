@@ -1,6 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
+import authStore, { SignupCredentials } from "../store/authStore";
 
 const SignUpPage = () => {
+  const [form, setForm] = useState<SignupCredentials>({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const { isLoading, signUp } = authStore();
+
+  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = () => {
+    signUp(form);
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center gap-8 text-darkGray">
       <div className="border border-softBlue px-2 py-1 font-semibold rounded-lg text-blue-400 bg-blue-100 cursor-pointer hover:scale-105 duration-200">
@@ -13,7 +30,7 @@ const SignUpPage = () => {
         </span>
 
         <div className="w-full">
-          <form className="w-full flex flex-col gap-3">
+          <form className="w-full flex flex-col gap-3" onSubmit={handleSubmit}>
             <div className="flex flex-col justify-center items-start gap-1">
               <label htmlFor="username" className="text-lg font-semibold">
                 Username
@@ -22,6 +39,9 @@ const SignUpPage = () => {
                 type="text"
                 placeholder="Username"
                 id="username"
+                name="username"
+                value={form.username}
+                onChange={onChangeHandler}
                 className="w-full border px-2 py-1 rounded-lg "
               />
             </div>
@@ -34,6 +54,9 @@ const SignUpPage = () => {
                 type="email"
                 placeholder="email"
                 id="email"
+                name="email"
+                value={form.email}
+                onChange={onChangeHandler}
                 className="w-full border px-2 py-1 rounded-lg "
               />
             </div>
@@ -46,6 +69,9 @@ const SignUpPage = () => {
                 type="password"
                 placeholder="password"
                 id="password"
+                name="password"
+                value={form.password}
+                onChange={onChangeHandler}
                 className="w-full border px-2 py-1 rounded-lg "
               />
             </div>
@@ -54,7 +80,7 @@ const SignUpPage = () => {
               type="submit"
               className="w-full cursor-pointer bg-softBlue hover:opacity-70 active:scale-105 duration-200 text-white rounded-lg py-2"
             >
-              Sign Up
+              {isLoading ? "Loading..." : "Sign Up"}
             </button>
           </form>
         </div>

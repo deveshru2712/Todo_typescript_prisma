@@ -8,13 +8,13 @@ interface User {
   email: string;
 }
 
-interface SignupCredentials {
+export interface SignupCredentials {
   username: string;
   email: string;
   password: string;
 }
 
-interface LogInCredentials {
+export interface LogInCredentials {
   email: string;
   password: string;
 }
@@ -92,4 +92,5 @@ const authStore = create<AuthStore>((set) => ({
     }
   },
 }));
+
 export default authStore;

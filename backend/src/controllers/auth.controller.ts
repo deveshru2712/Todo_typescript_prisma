@@ -93,12 +93,10 @@ export const logIn: RequestHandler<
       throw createHttpError(409, "Authorization error");
     }
 
-    res
-      .status(200)
-      .json({
-        user: { ...user, password: null },
-        message: "Logged in successfully",
-      });
+    res.status(200).json({
+      user: { ...user, password: null },
+      message: "Logged in successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -113,6 +111,14 @@ export const logOut: RequestHandler = (req, res, next) => {
     });
 
     res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe: RequestHandler = (req, res, next) => {
+  try {
+    res.status(200).json({ user: req.user });
   } catch (error) {
     next(error);
   }

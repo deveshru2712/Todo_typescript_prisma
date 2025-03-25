@@ -22,14 +22,17 @@ export interface LogInCredentials {
 interface AuthStore {
   user: User | null;
   isLoading: boolean;
+  isAuthChecking: boolean;
   signUp: (credentials: SignupCredentials) => Promise<void>;
   logIn: (credentials: LogInCredentials) => Promise<void>;
   logOut: () => Promise<void>;
+  authCheck: () => Promise<void>;
 }
 
 const authStore = create<AuthStore>((set) => ({
   user: null,
   isLoading: false,
+  isAuthChecking: false,
   signUp: async (credentials) => {
     set({ isLoading: true });
     try {
@@ -83,6 +86,24 @@ const authStore = create<AuthStore>((set) => ({
       });
     } catch (error) {
       set({ isLoading: false });
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || "Logout failed";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  },
+  authCheck: async () => {
+    set({ isAuthChecking: true });
+    try {
+      const response = await axios.get(`/api/auth`);
+      set({
+        isAuthChecking: false,
+        user: response.data.user,
+      });
+    } catch (error) {
+      set({ isAuthChecking: false, user: null });
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || "Logout failed";
         toast.error(errorMessage);

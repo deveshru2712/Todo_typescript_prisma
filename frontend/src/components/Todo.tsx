@@ -10,17 +10,27 @@ export interface Todos {
 }
 
 const Todo = ({ title, text, createdAt, updatedAt }: Todos) => {
-  const [clicked, setClicked] = useState(false);
-
+  const [editDialogBox, SetEditDialogBox] = useState(false);
   const CreatedAt = new Date(createdAt);
   const UpdatedAt = new Date(updatedAt);
 
+  const EditDialogBoxOpen = () => {
+    SetEditDialogBox(true);
+  };
+
+  const EditDialogBoxClose = () => {
+    SetEditDialogBox(false);
+    console.log(false);
+  };
+
   return (
     <div
-      onClick={() => setClicked((prev) => !prev)}
+      onClick={EditDialogBoxOpen}
       className="w-full border px-4 py-2 rounded-md flex flex-col gap-2 relative"
     >
-      {clicked ? <EditDialog title={title} text={text} /> : null}
+      {editDialogBox ? (
+        <EditDialog title={title} text={text} onClose={EditDialogBoxClose} />
+      ) : null}
       <h2 className="text-2xl font-semibold">{title}</h2>
       <span className="text-xl font-medium text-slate-600">{text}</span>
 

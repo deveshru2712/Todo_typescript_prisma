@@ -12,9 +12,9 @@ import SignUpPage from "./pages/SignUpPage";
 const App = () => {
   const { authCheck, user } = authStore();
 
-  // useEffect(() => {
-  //   authCheck();
-  // }, [authCheck]);
+  useEffect(() => {
+    authCheck();
+  }, [authCheck]);
 
   return (
     <div className="w-screen h-screen overflow-x-hidden">

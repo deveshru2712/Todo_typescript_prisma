@@ -58,12 +58,12 @@ export const createNote: RequestHandler<
   }
 };
 
-interface DeleteNoteParams {
-  id: string;
-}
+// interface DeleteNoteParams {
+//   id: string;
+// }
 
 export const deleteNote: RequestHandler<
-  DeleteNoteParams,
+  ParamsDictionary & { id: string },
   unknown,
   unknown,
   unknown

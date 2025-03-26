@@ -11,18 +11,18 @@ export const getNotes: RequestHandler = async (req, res, next) => {
       throw createHttpError(404, "Unable to found your account");
     }
 
-    const notes = await prismaClient.todo.findMany({
+    const todos = await prismaClient.todo.findMany({
       where: { userId: userId },
     });
 
-    if (!notes) {
+    if (!todos) {
       res.status(200).json({
-        message: "No notes found",
+        message: "No todos found",
       });
     }
 
     res.status(200).json({
-      notes,
+      todos,
     });
   } catch (error) {
     next(error);
@@ -73,14 +73,14 @@ export const deleteNote: RequestHandler<
   try {
     //parsing it to number as it is string
 
-    const noteId = parseInt(id);
+    const todoId = parseInt(id);
     const user = await prismaClient.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw createHttpError(404, "User not found!");
     }
 
     const todo = await prismaClient.todo.findFirst({
-      where: { id: noteId, userId: userId },
+      where: { id: todoId, userId: userId },
     });
 
     if (!todo) {
@@ -89,7 +89,7 @@ export const deleteNote: RequestHandler<
 
     const deleteTodo = await prismaClient.todo.delete({
       where: {
-        id: noteId,
+        id: todoId,
         userId: userId,
       },
     });
@@ -115,33 +115,25 @@ export const updateNote: RequestHandler<
   const userId = req.user.id;
   const { text, title } = req.body;
   try {
-    const noteId = parseInt(id);
+    const todoId = parseInt(id);
     const user = await prismaClient.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw createHttpError(404, "Unable to found User");
     }
 
-    const note = await prismaClient.todo.update({
+    const todo = await prismaClient.todo.update({
       where: {
-        id: noteId,
+        id: todoId,
         userId,
       },
       data: {
         text,
         title,
       },
-      select: {
-        id: true,
-        title: true,
-        text: true,
-        completed: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
 
     res.status(200).json({
-      note,
+      todo,
       message: "Todo updated",
     });
   } catch (error) {

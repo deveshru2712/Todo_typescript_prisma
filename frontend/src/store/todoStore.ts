@@ -8,11 +8,16 @@ interface UpdateTodoBody {
   text: string;
 }
 
+interface CreateTodoBody {
+  title: string;
+  text: string;
+}
+
 interface TodoStore {
   TodoArr: Todos[];
   isFetching: boolean;
   getTodo: () => Promise<void>;
-  createTodo: () => Promise<void>;
+  createTodo: (createTodoBody: CreateTodoBody) => Promise<void>;
   updateTodo: (updateTodoBody: UpdateTodoBody, id: number) => Promise<void>;
   deleteTodo: (id: number) => Promise<void>;
 }
@@ -24,7 +29,7 @@ const todoStore = create<TodoStore>((set) => ({
     set({ isFetching: true });
     try {
       const response = await axios.get(`/api/todo`);
-      set({ TodoArr: response.data.notes, isFetching: false });
+      set({ TodoArr: response.data.todos, isFetching: false });
       console.log(response);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -36,7 +41,26 @@ const todoStore = create<TodoStore>((set) => ({
       }
     }
   },
-  createTodo: async () => {},
+  createTodo: async (createTodoBody: CreateTodoBody) => {
+    set({ isFetching: true });
+    try {
+      const response = await axios.post(`/api/todo`, createTodoBody);
+      set((state) => ({
+        TodoArr: [...state.TodoArr, response.data.todo],
+        isFetching: false,
+      }));
+      toast.success("Todo created");
+    } catch (error) {
+      set({ isFetching: false });
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Unable to create todo";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  },
   updateTodo: async (updateTodoBody: UpdateTodoBody, TodoId: number) => {
     set({ isFetching: true });
     try {
@@ -44,7 +68,7 @@ const todoStore = create<TodoStore>((set) => ({
 
       set((state) => ({
         TodoArr: state.TodoArr.map((item) =>
-          item.id === TodoId ? response.data.note : item
+          item.id === TodoId ? response.data.todo : item
         ),
         isFetching: false,
       }));

@@ -14,7 +14,7 @@ interface TodoStore {
   getTodo: () => Promise<void>;
   createTodo: () => Promise<void>;
   updateTodo: (updateTodoBody: UpdateTodoBody, id: number) => Promise<void>;
-  deleteTodo: () => Promise<void>;
+  deleteTodo: (id: number) => Promise<void>;
 }
 
 const todoStore = create<TodoStore>((set) => ({
@@ -48,18 +48,40 @@ const todoStore = create<TodoStore>((set) => ({
         ),
         isFetching: false,
       }));
+      toast.success("Todo Updated");
     } catch (error) {
       set({ isFetching: false });
       if (axios.isAxiosError(error)) {
         const errorMessage =
-          error.response?.data?.message || "Unable to fetch todo's";
+          error.response?.data?.message || "Unable to update todo";
         toast.error(errorMessage);
       } else {
         toast.error("An unexpected error occurred");
       }
     }
   },
-  deleteTodo: async () => {},
+  deleteTodo: async (TodoId: number) => {
+    set({ isFetching: true });
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await axios.delete(`/api/todo/${TodoId}`);
+
+      set((state) => ({
+        TodoArr: state.TodoArr.filter((item) => item.id !== TodoId),
+        isFetching: false,
+      }));
+      toast.success("Todo deleted");
+    } catch (error) {
+      set({ isFetching: false });
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Unable to delete todo";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  },
 }));
 
 export default todoStore;

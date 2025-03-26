@@ -28,4 +28,6 @@ router.patch(
 //delete notes
 router.delete("/:id", protectRoute, noteController.deleteNote);
 
+router.patch("/status/:id", protectRoute, noteController.updateStatus);
+
 export default router;

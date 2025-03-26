@@ -20,6 +20,7 @@ interface TodoStore {
   createTodo: (createTodoBody: CreateTodoBody) => Promise<void>;
   updateTodo: (updateTodoBody: UpdateTodoBody, id: number) => Promise<void>;
   deleteTodo: (id: number) => Promise<void>;
+  updateTodoStatus: (id: number) => Promise<void>;
 }
 
 const todoStore = create<TodoStore>((set) => ({
@@ -41,7 +42,7 @@ const todoStore = create<TodoStore>((set) => ({
       }
     }
   },
-  createTodo: async (createTodoBody: CreateTodoBody) => {
+  createTodo: async (createTodoBody) => {
     set({ isFetching: true });
     try {
       const response = await axios.post(`/api/todo`, createTodoBody);
@@ -61,7 +62,7 @@ const todoStore = create<TodoStore>((set) => ({
       }
     }
   },
-  updateTodo: async (updateTodoBody: UpdateTodoBody, TodoId: number) => {
+  updateTodo: async (updateTodoBody, TodoId) => {
     set({ isFetching: true });
     try {
       const response = await axios.patch(`/api/todo/${TodoId}`, updateTodoBody);
@@ -84,7 +85,7 @@ const todoStore = create<TodoStore>((set) => ({
       }
     }
   },
-  deleteTodo: async (TodoId: number) => {
+  deleteTodo: async (TodoId) => {
     set({ isFetching: true });
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,6 +96,27 @@ const todoStore = create<TodoStore>((set) => ({
         isFetching: false,
       }));
       toast.success("Todo deleted");
+    } catch (error) {
+      set({ isFetching: false });
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Unable to delete todo";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  },
+  updateTodoStatus: async (TodoId) => {
+    set({ isFetching: false });
+    try {
+      const response = await axios.patch(`/api/todo/status/${TodoId}`);
+      set((state) => ({
+        TodoArr: state.TodoArr.map((item) =>
+          item.id === TodoId ? response.data.todo : item
+        ),
+      }));
+      toast.success("Status updated");
     } catch (error) {
       set({ isFetching: false });
       if (axios.isAxiosError(error)) {

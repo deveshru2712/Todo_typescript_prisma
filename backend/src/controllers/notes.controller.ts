@@ -140,3 +140,41 @@ export const updateNote: RequestHandler<
     next(error);
   }
 };
+
+export const updateStatus: RequestHandler<
+  ParamsDictionary & { id: string },
+  unknown,
+  unknown,
+  unknown
+> = async (req, res, next) => {
+  const todoId = parseInt(req.params.id);
+  const userId = req.user.id;
+  try {
+    const user = await prismaClient.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+
+    const todo = await prismaClient.todo.findUnique({
+      where: {
+        id: todoId,
+        userId: userId,
+      },
+    });
+
+    if (!todo) {
+      throw createHttpError(404, "Todo not found");
+    }
+
+    const updateTodo = await prismaClient.todo.update({
+      where: { id: todoId, userId: userId },
+      data: {
+        completed: !todo.completed,
+      },
+    });
+
+    res.status(200).json({ todo: updateTodo });
+  } catch (error) {
+    next(error);
+  }
+};

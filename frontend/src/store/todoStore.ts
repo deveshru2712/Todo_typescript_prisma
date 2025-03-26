@@ -3,12 +3,17 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 import { Todos } from "../components/Todo";
 
+interface UpdateTodoBody {
+  title: string;
+  text: string;
+}
+
 interface TodoStore {
   TodoArr: Todos[];
   isFetching: boolean;
   getTodo: () => Promise<void>;
   createTodo: () => Promise<void>;
-  updateTodo: () => Promise<void>;
+  updateTodo: (updateTodoBody: UpdateTodoBody, id: number) => Promise<void>;
   deleteTodo: () => Promise<void>;
 }
 
@@ -32,7 +37,28 @@ const todoStore = create<TodoStore>((set) => ({
     }
   },
   createTodo: async () => {},
-  updateTodo: async () => {},
+  updateTodo: async (updateTodoBody: UpdateTodoBody, TodoId: number) => {
+    set({ isFetching: true });
+    try {
+      const response = await axios.patch(`/api/todo/${TodoId}`, updateTodoBody);
+
+      set((state) => ({
+        TodoArr: state.TodoArr.map((item) =>
+          item.id === TodoId ? response.data.note : item
+        ),
+        isFetching: false,
+      }));
+    } catch (error) {
+      set({ isFetching: false });
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Unable to fetch todo's";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  },
   deleteTodo: async () => {},
 }));
 

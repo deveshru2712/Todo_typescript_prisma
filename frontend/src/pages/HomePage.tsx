@@ -11,14 +11,17 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col gap-4 justify-center items-center p-8">
-      {TodoArr.map((elem, idx) => (
-        <Todo
-          key={idx}
-          title={elem.title}
-          text={elem.text}
-          createdAt={elem.createdAt}
-          updatedAt={elem.updatedAt}
-        />
+      {TodoArr.map((elem) => (
+        <div key={elem.id} className="h-fit w-full">
+          <Todo
+            id={elem.id}
+            title={elem.title}
+            text={elem.text}
+            completed={elem.completed}
+            createdAt={elem.createdAt}
+            updatedAt={elem.updatedAt}
+          />
+        </div>
       ))}
     </div>
   );

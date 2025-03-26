@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import todoStore from "../store/todoStore";
 
 interface EditDialogProps {
+  id: number;
   title: string;
   text: string;
   onClose: () => void;
 }
 
-const EditDialog = ({ title, text, onClose }: EditDialogProps) => {
+const EditDialog = ({ id, title, text, onClose }: EditDialogProps) => {
   const { updateTodo } = todoStore();
 
   const [form, setForm] = useState({
@@ -18,16 +19,13 @@ const EditDialog = ({ title, text, onClose }: EditDialogProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate form before submission
     if (!form.title.trim()) {
       alert("Title cannot be empty");
       return;
     }
 
-    // Call update todo method from your store
-    // updateTodo(form);
+    updateTodo(form, id);
 
-    // Close the dialog after updating
     onClose();
   };
 
@@ -37,7 +35,6 @@ const EditDialog = ({ title, text, onClose }: EditDialogProps) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // Handle clicking outside the dialog to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const dialog = document.querySelector(".edit-dialog");
@@ -53,6 +50,7 @@ const EditDialog = ({ title, text, onClose }: EditDialogProps) => {
   }, [onClose]);
 
   return (
+    // the inset means that it will cover the whole page
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="edit-dialog bg-white p-6 rounded-lg shadow-xl w-4/5 max-w-md">
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>

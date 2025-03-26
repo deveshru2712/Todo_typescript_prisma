@@ -3,13 +3,15 @@ import formatDate from "../utils/dateFormatter";
 import EditDialog from "./EditDialog";
 
 export interface Todos {
+  id: number;
   title: string;
   text: string;
+  completed: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-const Todo = ({ title, text, createdAt, updatedAt }: Todos) => {
+const Todo = ({ id, title, text, createdAt, updatedAt }: Todos) => {
   const [editDialogBox, SetEditDialogBox] = useState(false);
   const CreatedAt = new Date(createdAt);
   const UpdatedAt = new Date(updatedAt);
@@ -29,7 +31,12 @@ const Todo = ({ title, text, createdAt, updatedAt }: Todos) => {
       className="w-full border px-4 py-2 rounded-md flex flex-col gap-2 relative"
     >
       {editDialogBox ? (
-        <EditDialog title={title} text={text} onClose={EditDialogBoxClose} />
+        <EditDialog
+          id={id}
+          title={title}
+          text={text}
+          onClose={EditDialogBoxClose}
+        />
       ) : null}
       <h2 className="text-2xl font-semibold">{title}</h2>
       <span className="text-xl font-medium text-slate-600">{text}</span>

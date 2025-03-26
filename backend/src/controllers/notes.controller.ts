@@ -130,9 +130,18 @@ export const updateNote: RequestHandler<
         text,
         title,
       },
+      select: {
+        id: true,
+        title: true,
+        text: true,
+        completed: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     res.status(200).json({
+      note,
       message: "Todo updated",
     });
   } catch (error) {

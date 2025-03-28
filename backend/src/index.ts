@@ -6,12 +6,16 @@ import createHttpError, { isHttpError } from "http-errors";
 import cors from "cors";
 import { z } from "zod";
 
+import path from "path";
+
 import env from "./utils/validateEnv";
 import authRouter from "./routes/auth.routes";
 import todoRouter from "./routes/notes.routes";
 import protectRoute from "./middleware/protectRoute";
 
 const app = express();
+
+const __dirname = path.resolve();
 
 app.use(cors());
 app.use(morgran("dev"));
@@ -56,6 +60,14 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   }
   res.status(statusCode).json({ error: errorMessage });
 });
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(env.PORT, () => {
   console.log(`The server is running on the port: ${env.PORT}`);
